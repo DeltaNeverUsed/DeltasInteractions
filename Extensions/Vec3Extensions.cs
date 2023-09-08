@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DeltasInteractions
+namespace DeltasInteractions.Extensions
 {
     public static class Vec3Extensions
     {
