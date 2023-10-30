@@ -22,13 +22,14 @@ namespace DeltasInteractions.TransformDrivers
         
         //
         
-        private Transform[] _snapTargets = Array.Empty<Transform>();
+        private SnapTarget[] _snapTargets = Array.Empty<SnapTarget>();
         private bool _hasSnapTargets;
 
+        private Rigidbody _rb;
         private VRCPickup _pickup;
         private bool _hasVRCPickup;
-
-        [NonSerialized] public Transform SnapTarget;
+        
+        [NonSerialized] public SnapTarget SnapTarget;
         [NonSerialized] public bool IsSnapping;
         [NonSerialized] public bool IsFullySnapped;
         
@@ -36,6 +37,7 @@ namespace DeltasInteractions.TransformDrivers
 
         private void Start()
         {
+            _rb = GetComponent<Rigidbody>();
             _pickup = GetComponent<VRCPickup>();
             _hasVRCPickup = _pickup != null;
             
@@ -43,7 +45,7 @@ namespace DeltasInteractions.TransformDrivers
             foreach (var target in allSnapTargets)
             {
                 if (snapToAnyTag || snappingTags.Contains(target.Tag))
-                    _snapTargets = _snapTargets.Add(target.transform); // a lil' slow
+                    _snapTargets = _snapTargets.Add(target);
             }
 
             _hasSnapTargets = _snapTargets.Length > 0;
@@ -72,8 +74,10 @@ namespace DeltasInteractions.TransformDrivers
                 NotSnapped();
         }
 
-        public void StartSnapping(Transform target)
+        public void StartSnapping(SnapTarget target)
         {
+            target.CurrentSnaps += 1;
+            
             _snapProgress = 0;
             SnapTarget = target;
             IsSnapping = true;
@@ -84,6 +88,8 @@ namespace DeltasInteractions.TransformDrivers
         }
         public void StopSnapping()
         {
+            if (IsSnapping)
+                SnapTarget.CurrentSnaps += 1;
             SnapTarget = null;
             IsSnapping = false;
             IsFullySnapped = false;
@@ -93,11 +99,9 @@ namespace DeltasInteractions.TransformDrivers
         {
             var curr = _snapTargets[_checkIndex % _snapTargets.Length];
             
-            if (!curr.gameObject.activeInHierarchy)
-                return;
-
-            if (Vector3.Distance(curr.transform.position, transform.position) <= snappingDistance)
-                StartSnapping(curr);
+            if (curr.gameObject.activeInHierarchy && curr.CurrentSnaps != curr.maxSnaps)
+                if (Vector3.Distance(curr.transform.position, transform.position) <= snappingDistance)
+                    StartSnapping(curr);
             
             _checkIndex++;
         }
@@ -110,17 +114,26 @@ namespace DeltasInteractions.TransformDrivers
             _snapProgress += Time.deltaTime / snappingSpeed;
 
             var progger = Mathf.SmoothStep(0, 1, _snapProgress);
+
+            var snapTargetTransform = SnapTarget.transform;
             
-            transform.position = Vector3.Lerp(_startPos, SnapTarget.position, progger);
-            transform.rotation = Quaternion.Slerp(_startRot, SnapTarget.rotation, progger);
+            transform.position = Vector3.Lerp(_startPos, snapTargetTransform.position, progger);
+            transform.rotation = Quaternion.Slerp(_startRot, snapTargetTransform.rotation, progger);
 
             if (_snapProgress >= 1)
                 IsFullySnapped = true;
         }
         private void Snapped()
         {
-            transform.position = SnapTarget.position;
-            transform.rotation = SnapTarget.rotation;
+            var snapTargetTransform = SnapTarget.transform;
+            transform.position = snapTargetTransform.position;
+            transform.rotation = snapTargetTransform.rotation;
+
+            if (_hasVRCPickup)
+            {
+                _rb.velocity = Vector3.zero;
+                _rb.angularVelocity = Vector3.zero;
+            }
         }
     }
 }
