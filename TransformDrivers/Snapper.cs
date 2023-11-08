@@ -89,7 +89,7 @@ namespace DeltasInteractions.TransformDrivers
         public void StopSnapping()
         {
             if (IsSnapping)
-                SnapTarget.CurrentSnaps += 1;
+                SnapTarget.CurrentSnaps -= 1;
             SnapTarget = null;
             IsSnapping = false;
             IsFullySnapped = false;

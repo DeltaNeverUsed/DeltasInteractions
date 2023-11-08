@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UdonSharp;
+using UnityEngine;
 
 namespace DeltasInteractions.Utils
 {
@@ -33,6 +34,11 @@ namespace DeltasInteractions.Utils
             return current;
         }
         
+        public static Transform GetHighestParent(this Component startObject)
+        {
+            return GetHighestParent(startObject.transform);
+        }
+        
         public static Transform GetHighestParent(this Transform startObject)
         {
             var currentObject = startObject;
@@ -44,6 +50,26 @@ namespace DeltasInteractions.Utils
             }
 
             return currentObject;
+        }
+        
+        public static T[] GetComponentsInChildrenOfHighestParent<T>(this Component startObject)
+        {
+            return startObject.GetHighestParent().GetComponentsInChildren<T>();
+        }
+        
+        public static T[] GetComponentsInChildrenOfHighestParent<T>(this Transform startObject)
+        {
+            return startObject.GetHighestParent().GetComponentsInChildren<T>();
+        }
+
+        public static T GetComponentInChildrenOfHighestParent<T>(this Component startObject)
+        {
+            return startObject.GetHighestParent().GetComponentInChildren<T>();
+        }
+        
+        public static T GetComponentInChildrenOfHighestParent<T>(this Transform startObject)
+        {
+            return startObject.GetHighestParent().GetComponentInChildren<T>();
         }
     }
 }

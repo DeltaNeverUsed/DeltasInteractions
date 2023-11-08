@@ -26,6 +26,8 @@ namespace DeltasInteractions.TransformDrivers
 
         private void FixedUpdate()
         {
+            if (!target)
+                return;
             var newVel = _rb.velocity + UpdatePID(Time.fixedDeltaTime, target.position, transform.position);
             _rb.velocity = newVel.Clamp(-maxVelocity, maxVelocity);
         }
