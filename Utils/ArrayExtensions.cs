@@ -1,4 +1,6 @@
-﻿namespace DeltasInteractions.Utils
+﻿using System;
+
+namespace DeltasInteractions.Utils
 {
     public static class ArrayExtensions
     {
@@ -8,6 +10,11 @@
                 if (hay.Equals(needle))
                     return true;
             return false;
+        }
+        
+        public static int IndexOf<T>(this T[] haystack, T needle)
+        {
+            return Array.IndexOf(haystack, needle);
         }
 
         public static T[] Add<T>(this T[] array, T item)

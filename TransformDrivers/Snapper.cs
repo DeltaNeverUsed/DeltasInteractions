@@ -19,6 +19,7 @@ namespace DeltasInteractions.TransformDrivers
         [Space]
         public float snappingDistance = 0.2f;
         public float snappingSpeed = 0.5f;
+        public bool resizeToSnapTarget;
         
         //
         
@@ -85,6 +86,7 @@ namespace DeltasInteractions.TransformDrivers
             
             _startPos = transform.position;
             _startRot = transform.rotation;
+            _startScale = transform.lossyScale;
         }
         public void StopSnapping()
         {
@@ -108,6 +110,7 @@ namespace DeltasInteractions.TransformDrivers
 
         private float _snapProgress;
         private Vector3 _startPos;
+        private Vector3 _startScale;
         private Quaternion _startRot;
         private void GotoSnapped()
         {
@@ -119,7 +122,9 @@ namespace DeltasInteractions.TransformDrivers
             
             transform.position = Vector3.Lerp(_startPos, snapTargetTransform.position, progger);
             transform.rotation = Quaternion.Slerp(_startRot, snapTargetTransform.rotation, progger);
-
+            if (resizeToSnapTarget)
+                transform.localScale = Vector3.Lerp(_startScale, transform.parent.InverseTransformVector(snapTargetTransform.lossyScale), progger);
+            
             if (_snapProgress >= 1)
                 IsFullySnapped = true;
         }

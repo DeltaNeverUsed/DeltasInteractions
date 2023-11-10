@@ -71,5 +71,15 @@ namespace DeltasInteractions.Utils
         {
             return startObject.GetHighestParent().GetComponentInChildren<T>();
         }
+        
+        public static T GetComponentInHighestParent<T>(this Component startObject)
+        {
+            return startObject.GetHighestParent().GetComponent<T>();
+        }
+        
+        public static T GetComponentInHighestParent<T>(this Transform startObject)
+        {
+            return startObject.GetHighestParent().GetComponent<T>();
+        }
     }
 }
