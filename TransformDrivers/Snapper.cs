@@ -11,7 +11,7 @@ namespace DeltasInteractions.TransformDrivers
 {
     [DefaultExecutionOrder(100)]
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
-    public class Snapper : UdonSharpBehaviour
+    public class Snapper : UpdateSleepable
     {
         public string[] snappingTags = Array.Empty<string>();
         public bool snapToAnyTag;
@@ -50,6 +50,9 @@ namespace DeltasInteractions.TransformDrivers
             }
 
             _hasSnapTargets = _snapTargets.Length > 0;
+            
+            if (_hasSnapTargets)
+                UpdateWake();
         }
 
         public override void OnPickup()
@@ -57,12 +60,16 @@ namespace DeltasInteractions.TransformDrivers
             StopSnapping();
         }
 
+        public override void OnDrop()
+        {
+            UpdateWake();
+        }
+
 
         private int _checkIndex;
-        private void Update()
+        public override void SubUpdate()
         {
-            if ( (_hasVRCPickup && _pickup.IsHeld) || !_hasSnapTargets)
-                return;
+            base.SubUpdate();
             
             if (IsSnapping)
             {
@@ -95,6 +102,7 @@ namespace DeltasInteractions.TransformDrivers
             SnapTarget = null;
             IsSnapping = false;
             IsFullySnapped = false;
+            UpdateSleep();
         }
 
         private void NotSnapped()

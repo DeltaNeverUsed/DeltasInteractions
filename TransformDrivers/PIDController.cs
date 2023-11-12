@@ -1,12 +1,13 @@
 ﻿using System;
 using DeltasInteractions.Extensions;
+using DeltasInteractions.Utils;
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace DeltasInteractions.TransformDrivers
 {
-    public class PIDController : UdonSharpBehaviour
+    public class PIDController : UpdateSleepable
     {
         public float Kp = 1f;
         public float Ki = 0f;
