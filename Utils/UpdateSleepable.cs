@@ -11,7 +11,7 @@ namespace DeltasInteractions.Utils
         
         public void UpdateWake(bool now = false)
         {
-            if (UpdateAwake)
+            if (UpdateAwake || !(gameObject.activeInHierarchy && enabled))
                 return;
             UpdateAwake = true;
             
@@ -28,7 +28,7 @@ namespace DeltasInteractions.Utils
         
         public void LateUpdateWake(bool now = false)
         {
-            if (LateUpdateAwake)
+            if (LateUpdateAwake || !(gameObject.activeInHierarchy && enabled))
                 return;
             LateUpdateAwake = true;
             
@@ -45,14 +45,18 @@ namespace DeltasInteractions.Utils
 
         public virtual void SubUpdate()
         {
-            if (UpdateAwake)
+            if (UpdateAwake && gameObject.activeInHierarchy && enabled)
                 SendCustomEventDelayedFrames(nameof(SubUpdate), 1);
+            else
+                UpdateSleep();
         }
         
         public virtual void LateSubUpdate()
         {
-            if (LateUpdateAwake)
-                SendCustomEventDelayedFrames(nameof(LateSubUpdate), 1);
+            if (LateUpdateAwake && gameObject.activeInHierarchy && enabled)
+                SendCustomEventDelayedFrames(nameof(LateSubUpdate), 1, EventTiming.LateUpdate);
+            else
+                LateUpdateSleep();
         }
     }
 }

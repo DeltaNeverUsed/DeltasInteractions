@@ -6,10 +6,7 @@ namespace DeltasInteractions.Utils
     {
         public static bool Contains<T>(this T[] haystack, T needle)
         {
-            foreach (var hay in haystack)
-                if (hay.Equals(needle))
-                    return true;
-            return false;
+            return Array.IndexOf(haystack, needle) != -1;
         }
         
         public static int IndexOf<T>(this T[] haystack, T needle)
@@ -24,6 +21,47 @@ namespace DeltasInteractions.Utils
             array.CopyTo(tempArray, 0);
             tempArray[len-1] = item;
             return tempArray;
+        }
+        
+        public static T[] Concat<T>(this T[] array, T[] array2)
+        {
+            var ar1Len = array.Length;
+            var ar2Len = array2.Length;
+
+            if (ar2Len == 0)
+                return array;
+            
+            var tempArray = new T[ar1Len + ar2Len];
+            Array.Copy(array, 0, tempArray, 0, ar1Len);
+
+            Array.Copy(array2, 0, tempArray, ar1Len, ar2Len);
+
+            return tempArray;
+        }
+
+        public static T[] RemoveFirst<T>(this T[] array, T item)
+        {
+            var index = array.IndexOf(item);
+            if (index == -1)
+                return array;
+
+            var newArray = new T[array.Length - 1];
+            Array.Copy(array, 0, newArray, 0, index);
+
+            if (index == newArray.Length)
+                return newArray;
+            
+            Array.Copy(array, index+1, newArray, index, newArray.Length - index);
+
+            return newArray;
+        }
+        
+        public static T[] RemoveAll<T>(this T[] array, T item)
+        {
+            while (array.Contains(item))
+                array = array.RemoveFirst(item);
+
+            return array;
         }
     }
 }

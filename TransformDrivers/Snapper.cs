@@ -3,9 +3,7 @@ using UdonSharp;
 using UnityEngine;
 
 using DeltasInteractions.Utils;
-using UnityEngine.Serialization;
 using VRC.SDK3.Components;
-using VRC.SDK3.Data;
 
 namespace DeltasInteractions.TransformDrivers
 {
@@ -70,7 +68,8 @@ namespace DeltasInteractions.TransformDrivers
         public override void SubUpdate()
         {
             base.SubUpdate();
-            
+         
+            //this.Log($"{gameObject.name}, Hello i am: {(enabled ? "enabled" : "not enabled")}");
             if (IsSnapping)
             {
                 if (IsFullySnapped)
