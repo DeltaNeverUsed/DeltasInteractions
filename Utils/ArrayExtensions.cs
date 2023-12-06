@@ -1,4 +1,5 @@
 ﻿using System;
+using VRC.SDKBase;
 
 namespace DeltasInteractions.Utils
 {
@@ -41,11 +42,21 @@ namespace DeltasInteractions.Utils
 
         public static T[] RemoveFirst<T>(this T[] array, T item)
         {
-            var index = array.IndexOf(item);
-            if (index == -1)
+            return array.RemoveIndex(array.IndexOf(item));
+        }
+        
+        public static T[] RemoveIndex<T>(this T[] array, int index)
+        {
+            if (index < 0)
                 return array;
 
             var newArray = new T[array.Length - 1];
+            if (index == 0)
+            {
+                Array.Copy(array, 1, newArray, 0, newArray.Length);
+                return newArray;
+            }
+            
             Array.Copy(array, 0, newArray, 0, index);
 
             if (index == newArray.Length)
@@ -58,8 +69,34 @@ namespace DeltasInteractions.Utils
         
         public static T[] RemoveAll<T>(this T[] array, T item)
         {
-            while (array.Contains(item))
-                array = array.RemoveFirst(item);
+            var tempArr = new T[array.Length];
+            array.CopyTo(tempArr, 0);
+            
+            var offset = 0;
+            for (var index = 0; index < tempArr.Length; index++)
+            {
+                if (!tempArr[index].Equals(item))
+                    continue;
+                array = array.RemoveIndex(index - offset);
+                offset++;
+            }
+
+            return array;
+        }
+        
+        public static T[] RemoveAllInvalid<T>(this T[] array)
+        {
+            var tempArr = new T[array.Length];
+            array.CopyTo(tempArr, 0);
+            
+            var offset = 0;
+            for (var index = 0; index < tempArr.Length; index++)
+            {
+                if (Utilities.IsValid(tempArr[index]))
+                    continue;
+                array = array.RemoveIndex(index - offset);
+                offset++;
+            }
 
             return array;
         }
